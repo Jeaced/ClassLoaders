@@ -24,6 +24,9 @@ public class StringProcessor implements Runnable, Parser {
             if (!isCyrillic(word.charAt(i))) {
                 return false;
             }
+            if (word.charAt(0) != 'ч') {
+                return false;
+            }
         }
         return true;
 
@@ -31,13 +34,18 @@ public class StringProcessor implements Runnable, Parser {
 
     boolean isCyrillic(char c) {
         if ((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z')) {
-            stopCondition.set(true);
+            synchronized (sharedHashMap) {
+                stopCondition.set(true);
+            }
         }
         return Character.UnicodeBlock.CYRILLIC.equals(Character.UnicodeBlock.of(c));
     }
 
     @Override
     public void parse() {
+        if (resource == null) {
+            System.out.println("Null");
+        }
         resource.replace("\n", "");
         resource = resource.trim().replaceAll(" +", " ");
         resource= resource.toLowerCase();
@@ -49,7 +57,7 @@ public class StringProcessor implements Runnable, Parser {
             words[i] = words[i].replaceAll("\\p{Punct}+$", "");
             if (checkWord(words[i])) {
                 sharedHashMap.compute(words[i], (k, v) -> v == null ? 1 : v + 1);
-                System.out.println(words[i] + " " + sharedHashMap.get(words[i]));
+                //System.out.println(words[i] + " " + sharedHashMap.get(words[i]));
             }
         }
     }

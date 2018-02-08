@@ -1,9 +1,18 @@
 import java.util.Scanner;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.lang.reflect.Proxy;
 
 public class Main {
     public static void main(String[] args) {
+        Parser magicParser = (Parser) Proxy.newProxyInstance(
+                                Parser.class.getClassLoader(),
+                                new Class[]{Parser.class},
+                                new MyHandler());
+        magicParser.parse();
+    }
+
+    public static void doEverything() {
         int resourcesAmount;
         int DEFAULT_RESOURCE_AMOUNT = 5;
         Scanner scanner = new Scanner(System.in);
